@@ -12,6 +12,14 @@ module.exports.parseResume = function(inputFile, outputDir) {
   });
 };
 
+module.exports.readResume = (inputFile => new Promise((res, rej) => {
+      parseIt.parseResumeFromFile(inputFile, (file, error) => {
+        if(error) return rej(error);
+        return res(file);
+      });
+    })
+);
+
 module.exports.parseResumeUrl = function(url) {
   return new Promise((resolve, reject) => {
     parseIt.parseResumeUrl(url, function(file, error) {

@@ -11,11 +11,12 @@ const ResumeParser = require('./src');
 //     console.error(error);
 //   });
 
-ResumeParser.parseResumeUrl('http://www.mysite.com/resume.txt') // url
-  .then(data => {
-    console.log('Yay! ', data);
-  })
-  .catch(error => {
-    console.log('parseResume failed');
-    console.error(error);
-  });
+// ResumeParser.parseResumeUrl('http://www.mysite.com/resume.txt') // url
+//   .then(data => {
+//     console.log('Yay! ', data);
+//   })
+//   .catch(error => {
+//     console.log('parseResume failed');
+//     console.error(error);
+//   });
+ResumeParser.readResume('./Profile.pdf')
