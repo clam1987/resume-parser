@@ -2,7 +2,12 @@ var _ = require('underscore'),
   resume = require('../Resume'),
   fs = require('fs'),
   dictionary = require('../../dictionary.js'),
-  logger = require('tracer').colorConsole();
+  logger = require('tracer').colorConsole(),
+  fe = require('./firstnames_f.json'),
+  ma = require('./firstnames_m.json'),
+  lastNames = require('./surnames.json'),
+  stopWords = require('./stopWords.json'),
+  firstNames = [...fe, ...ma];
 
 var profilesWatcher = {
   // for change value by reference
@@ -11,7 +16,99 @@ var profilesWatcher = {
 
 module.exports = {
   parse: parse,
+  parseLinkedInResumes: parseLinkedInResumes,
 };
+
+function test() {
+  const test = 'Contact\n' +
+'11592 Celine St. El Monte, CA\n' +
+'91732\n' +
+'6265378307 (Home)\n' +
+'cwlam1987@gmail.com\n' +
+'www.linkedin.com/in/wilson-lam87\n' +
+'(LinkedIn)\n' +
+'www.wilsondevworks.com/\n' +
+'(Personal)\n' +
+'www.wilsondevworks.com/\n' +
+'(Portfolio)\n' +
+'Top Skills\n' +
+'Front-end Development\n' +
+'React.js\n' +
+'JavaScript\n' +
+'Languages\n' +
+'Mandarian (Elementary)\n' +
+'Wilson Lam\n' +
+'Software Engineer at Model Match\n' +
+'Los Angeles Metropolitan Area\n' +
+'Summary\n' +
+'I am a solutions-driven Full-Stack Web Developer with strong skill\n' +
+"sets in both Front-End and Back-End. By utilizing these tools, I've\n" +
+'built several features for Omou and created websites for local\n' +
+'businesses.\n' +
+'Working for Omou has taught me that the world of coding is vast.\n' +
+"I've learned a lot from new ways to debug, problem solving from a\n" +
+'high level, new frameworks and libraries, etc. While working as a\n' +
+"Teaching Assistant for my bootcamp, I've reinforced and improved\n" +
+'upon my problem solving skills in both Front-End and Back-End.\n' +
+'Inherently, this job also gave me experience in some soft skills like\n' +
+'communication, patience, and translating code to English.\n' +
+'While attending the coding bootcamp through UCLA Extension, I\n' +
+'gained experience in React, HTML, CSS, BootStrap for the Front-\n' +
+'End while using Node, Express, MySQL and MongoDB for the Back-\n' +
+'End.\n' +
+'My love for technology has always been present, from when I first\n' +
+'learned how to build my own computer, reading about security\n' +
+'vulnerabilities of gaming systems, and watching tech conventions. It\n' +
+'is the core of my motivation and why I continually learn new topics\n' +
+'on coding.\n' +
+'Experience\n' +
+'Model Match\n' +
+'Software Engineer\n' +
+'March 2021 - Present (2 months)\n' +
+'Omou Learning\n' +
+'Frontend Developer\n' +
+'February 2020 - Present (1 year 3 months)\n' +
+'Greater Los Angeles Area\n' +
+'Page 1 of 2\n' +
+'Self employed\n' +
+'Full-stack Developer\n' +
+'October 2018 - Present (2 years 7 months)\n' +
+'Greater Los Angeles Area\n' +
+'UCLA Extension\n' +
+'Teaching Assistant\n' +
+'September 2019 - March 2021 (1 year 7 months)\n' +
+'Westwood, California\n' +
+'Letter Ride LLC\n' +
+'Delivery Driver\n' +
+'October 2018 - March 2019 (6 months)\n' +
+'Temple City, CA\n' +
+'Education\n' +
+'UCLA Extension\n' +
+'Certificate , Full Stack Web Development · (2019 - 2019)\n' +
+'Page 2 of 2\n' +
+'{end}';
+let words2 = test.split('\n')
+words2 = words2.filter((word) => {
+	return word.split(' ').length < 4 && word.split(' ').length > 1
+})
+words2 = words2.join(' ').match(/([A-Z][a-z]*)/g)
+words2 = words2.filter((word) => !stopWords.includes(word.toLowerCase()))
+words = words2.filter((word) => !stopWords.includes(word.toLowerCase()))
+console.log(words.length)
+words.forEach((word, i) => {
+	let count = 0
+	if (words.includes(word)) count++
+  if (count > 1) words.splice(i, 1)
+})
+let final = []
+for (let i = 0; i < words.length ; i++) {
+    if (firstNames.includes(words[i]) && lastNames.includes(words[i+1])) {
+        final.push(words[i] + ' ' + words[i+1])
+    }
+}
+console.log(words.length)
+console.log(final)
+}
 
 function makeRegExpFromDictionary() {
   var regularRules = {
@@ -61,6 +158,8 @@ function makeRegExpFromDictionary() {
 makeRegExpFromDictionary();
 
 function parse(PreparedFile, cbReturnResume) {
+  console.log('line 65')
+  console.log(PreparedFile)
   var rawFileData = PreparedFile.raw,
     Resume = new resume(),
     rows = rawFileData.split('\n'),
@@ -152,15 +251,36 @@ function parseDictionaryInline(Resume, row) {
 function parseDictionaryRegular(data, Resume) {
   var regularDictionary = dictionary.regular,
     find;
-
+    // console.log('line 158, how regex is generated:')
+    // console.log(regularDictionary)
+    // console.log('line 160, what the raw data is:')
+    // console.log(data)
   _.forEach(regularDictionary, function(expressions, key) {
+    // console.log(expressions)
+    // console.log(key)
     _.forEach(expressions, function(expression) {
       find = new RegExp(expression).exec(data);
+      // console.log('results of regex:')
+      // console.log(find)
       if (find) {
         Resume.addKey(key.toLowerCase(), find[0]);
+        // console.log(Resume)
       }
     });
   });
+};
+
+function parseDictionaryRegularLinkedin(data, Resume) {
+  // console.log(data)
+  var regularDictionary = dictionary.regularLinkedin,
+      find;
+      // console.log('parser.js line 181')
+      // console.log(typeof data)
+      _.forEach(regularDictionary, function(expressions, keys) {
+        _.forEach(expressions, function(expression) {
+          // console.log(expression)
+        });
+      });
 }
 
 /**
@@ -235,4 +355,51 @@ function parseDictionaryProfiles(row, Resume) {
   });
 
   return modifiedRow;
+}
+
+function parseLinkedInResumes(PreparedFile, cbReturnResume) {
+  // console.log('line 65')
+  // console.log(PreparedFile)
+  // var rawFileData = PreparedFile.raw,
+  // Resume = new resume(),
+  // rows = rawFileData.split('\n'),
+  // row;
+  // console.log(PreparedFile)
+
+    // console.log(rows)
+
+    test()
+  // save prepared file text (for debug)
+  //fs.writeFileSync('./parsed/'+PreparedFile.name + '.txt', rawFileData);
+
+  // 1 parse regulars
+  // parseDictionaryRegularLinkedin(rawFileData, Resume);
+
+  // for (var i = 0; i < rows.length; i++) {
+  //   row = rows[i];
+
+  //   // 2 parse profiles
+  //   row = rows[i] = parseDictionaryProfiles(row, Resume);
+  //   // 3 parse titles
+  //   parseDictionaryTitles(Resume, rows, i);
+  //   parseDictionaryInline(Resume, row);
+  // }
+
+  // if (_.isFunction(cbReturnResume)) {
+  //   // wait until download and handle internet profile
+  //   var i = 0;
+  //   var checkTimer = setInterval(function() {
+  //     i++;
+  //     /**
+  //      * FIXME:profilesWatcher.inProgress not going down to 0 for txt files
+  //      */
+  //     if (profilesWatcher.inProgress === 0 || i > 5) {
+  //       //if (profilesWatcher.inProgress === 0) {
+  //       cbReturnResume(Resume);
+  //       clearInterval(checkTimer);
+  //     }
+  //   }, 200);
+  // } else {
+  //   return console.error('cbReturnResume should be a function');
+  // }
 }

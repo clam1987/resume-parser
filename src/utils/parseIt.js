@@ -48,5 +48,22 @@ var parser = {
 
     processing.runUrl(url, onUrlReady);
   },
+  parseResumeFromFile: function(file, cbAfterParse) {
+    var objParseBoy = new ParseBoy();
+
+    var onFileReady = function(preppedData, error) {
+      if(error) return cbAfterParse(null, error);
+
+      objParseBoy.readFile(preppedData, function(Resume) {
+        // console.log('line 59')
+        // console.log(Resume)
+        logger.trace(
+          'I got Resume for ' + preppedData.name + ', now saving...'
+        );
+        
+      });
+    }
+    processing.runFile(file, onFileReady);
+  },
 };
 module.exports = parser;

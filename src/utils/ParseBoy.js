@@ -20,6 +20,12 @@ ParseBoy.prototype.parseFile = function(PreparedFile, cbGetResume) {
   parser.parse(PreparedFile, cbGetResume);
 };
 
+ParseBoy.prototype.readFile = function(PreparedFile, cbGetResume) {
+  logger.trace('I\'m wokring with pdf now');
+  // console.log(PreparedFile)
+  parser.parseLinkedInResumes(PreparedFile, cbGetResume);
+}
+
 ParseBoy.prototype.parseUrl = function(PreparedData, cbGetResume) {
   logger.trace("I'm working with file buffer now");
   parser.parse(
