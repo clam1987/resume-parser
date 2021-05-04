@@ -1,7 +1,7 @@
 const parseIt = require('./utils/parseIt');
 var logger = require('tracer').colorConsole();
 
-module.exports.parseResume = function(inputFile, outputDir) {
+module.exports.parseResumeFile = function(inputFile, outputDir) {
   return new Promise((resolve, reject) => {
     parseIt.parseResumeFile(inputFile, outputDir, function(file, error) {
       if (error) {
@@ -12,13 +12,16 @@ module.exports.parseResume = function(inputFile, outputDir) {
   });
 };
 
-module.exports.readResume = (inputFile => new Promise((res, rej) => {
-      parseIt.parseResumeFromFile(inputFile, (file, error) => {
-        if(error) return rej(error);
-        return res(file);
-      });
-    })
-);
+module.exports.readResume = function(inputFile) {
+  return new Promise((res, rej) => {
+    parseIt.parseResumeFromFile(inputFile, function(file, error) {
+      if(error) {
+        return rej(error)
+      }
+      return res(file);
+    });
+  });
+}
 
 module.exports.parseResumeUrl = function(url) {
   return new Promise((resolve, reject) => {
