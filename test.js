@@ -5,7 +5,7 @@ const fs = require('fs');
 
 // const fileDir = process.cwd();
 // ResumeParser
-//   .parseResumeFile(fileDir + '/test.pdf', fileDir + '/compiled') //input file, output dir
+//   .parseResumeFile(fileDir + '/test16.pdf', fileDir + '/compiled') //input file, output dir
 //   .then(file => {
 //     console.log("Yay! " + file);
 //   })
@@ -22,22 +22,27 @@ const fs = require('fs');
 //     console.log('parseResume failed');
 //     console.error(error);
 //   });
-ResumeParser.readResume('./Profile.pdf')
+// ResumeParser.readResume('./Profile.pdf')
+//   .then(data => {
+//         // console.log(data)
+//   })
+
+ResumeParser.readResume('./test18.docx')
   .then(data => {
-        // console.log(data)
+        console.log(data)
   })
 
-ResumeParser.readResume('./test.pdf')
-  .then(data => {
-        // console.log(data)
-  })
+// ResumeParser.readResume('./test18.pdf')
+//   .then(data => {
+//         console.log(data)
+//   })
 
-for(let i = 1; i < 13; i++) {
-  ResumeParser.readResume(`./test${i}.pdf`)
-  .then(data => {
-      // console.log(data)
-  })
-}
+// for(let i = 1; i < 13; i++) {
+//   ResumeParser.readResume(`./test${i}.pdf`)
+//   .then(data => {
+//       // console.log(data)
+//   })
+// }
 // console.log(m_firstnames.length)
 // console.log(f_firstnames.length)
 // console.log(m_firstnames2.length);

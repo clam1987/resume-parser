@@ -55,12 +55,13 @@ var parser = {
       if(error) return cbAfterParse(null, error);
 
       objParseBoy.readFile(preppedData, function(Resume) {
+        // console.log(preppedData)
         // console.log('line 59')
         // console.log(Resume)
         logger.trace(
           'I got Resume for ' + preppedData.name + ', now saving...'
         );
-        
+        return cbAfterParse(Resume.parts)
       });
     }
     processing.runFile(file, onFileReady);

@@ -158,8 +158,8 @@ function makeRegExpFromDictionary() {
 makeRegExpFromDictionary();
 
 function parse(PreparedFile, cbReturnResume) {
-  console.log('line 65')
-  console.log(PreparedFile)
+  // console.log('line 65')
+  // console.log(PreparedFile)
   var rawFileData = PreparedFile.raw,
     Resume = new resume(),
     rows = rawFileData.split('\n'),
@@ -274,6 +274,8 @@ function parseDictionaryRegularLinkedin(data, Resume) {
   const regularDictionary = dictionary.regularLinkedin;
   let find;
   const target = []
+  console.log(data)
+  // console.log(data)
   // --Name Section--
 // console.log(data)
   // const nameData = data.split('\n').filter((txt, i) => txt.split(' ').length < 3 && txt.split(' ').length > 1).join(' ').split(' ').filter((x, i, arr) => firstNames.includes(x) && lastNames.includes(x))
@@ -292,21 +294,27 @@ function parseDictionaryRegularLinkedin(data, Resume) {
   // !x.match(/\(([^)]+)\)/) filter weird paranthesis
   // .join(' ').split(' ').filter((x, i, arr) => firstNames.includes(x) && lastNames.includes(x)); this filter works on getting my name
   // console.log(nameData)
-  let final = []
+  const name = []
 for (let i = 0; i < nameData.length ; i++) {
     if (firstNames.includes(nameData[i]) && lastNames.includes(nameData[i+1])) {
-        final.push(nameData[i] + ' ' + nameData[i+1])
+        name.push(nameData[i] + ' ' + nameData[i+1])
     }
 }
 
-console.log('name:', final[0])
+if(name[0]) {
+  Resume.addKey("name", name[0]);
+  // console.log('name:', name[0])
+}
 
 // --Email Section--
-const emailData = new RegExp(regularDictionary.email[0]).exec(data)?.[0] || 'none'
-console.log('email:', emailData)
+const emailData = new RegExp(regularDictionary.email[0]).exec(data)?.[0] || 'none';
+console.log(emailData)
+if(emailData !== 'none') {
+  Resume.addKey("email", emailData);
+};
 
 // --Phone Section--
-const phoneData = data.split('\n').filter((txt, i) => txt.split(' ').length < 3 && txt.split(' ').length > 1).join(' ').split(' ').filter(x => !x.match(/\(([^)]+)\)/) && (x.match(/^\d{3}-\d{3}-\d{4}$/) || x.match(/^\d{3}\d{3}\d{4}$/) || x.match(/^\d{3}\d{3}\d{4}$/) || x.match(/^\d{3}-\d{3}-\d{3}$/) || x.match(/^([\d]{6}|((\([\d]{3}\)|[\d]{3})( [\d]{3} |-[\d]{3}-)))[\d]{4}$/)))?.[0] || 'cannot parse'
+const phoneData = data.split('\n').filter((txt, i) => txt.split(' ').length < 3 && txt.split(' ').length > 1).join(' ').split(' ').filter(x => !x.match(/\(([^)]+)\)/) && (x.match(/^\d{3}-\d{3}-\d{4}$/) || x.match(/^\d{3}\d{3}\d{4}$/) || x.match(/^\d{3}\d{3}\d{4}$/) || x.match(/^\d{3}-\d{3}-\d{3}$/) || x.match(/^([\d]{6}|((\([\d]{3}\)|[\d]{3})( [\d]{3} |-[\d]{3}-)))[\d]{4}$/)))?.[0] || new RegExp(regularDictionary.phone[0]).exec(data)?.[0]
 // const phoneData = data.split('\n').filter(txt => txt.split(" ").filter(x => x.match(/^\(?\d{1,3}-?\)?\d*-?\d*/)).join('')).reduce((a, b) => {
 //   b.split(' ').filter(x => {
 //     if(x.match(/^\(?\d{2,3}-?\)?\d*-?\d*/)) {
@@ -318,7 +326,45 @@ const phoneData = data.split('\n').filter((txt, i) => txt.split(' ').length < 3 
 //   return a
 // }, []);
 // const phoneData = data.split('\n').map(x => x.replace(/ /g, "")).filter(x => x.match(/^\(?\d{1,3}-?\)?\d*-?\d*/))
-console.log(phoneData)
+// console.log(phoneData)
+if(phoneData) {
+  Resume.addKey("phone", phoneData);
+  // console.log(phoneData)
+}
+
+// --Address--
+
+// console.log(data)
+const addressData = data.split('\n').filter((txt, i) => txt.split(' ').length < 7 && txt.split(' ').length > 2)?.[0];
+const zipCodeData = data.split('\n').filter(zip => zip.match(regularDictionary.zip[0]))[0];
+const cityStateAndZip = data.split('\n').filter(addressLine2 => addressLine2.split(' ').length < 5 && addressLine2.split(' ').length > 2)?.[0];
+const addressArr = addressData.split(' ')
+const doesSteNumberExist = addressArr[addressArr.length - 1].match(/^.*?(\d+(?:[.,]\d+)?)\s*$/)?.[0];
+let fullAddress
+if(doesSteNumberExist) {
+fullAddress = `${addressData} ${cityStateAndZip}`
+  // console.log(fullAddress)
+  // Resume.addKey('address', )
+  // console.log(doesSteNumberExist)
+
+} else if(zipCodeData) {
+fullAddress = `${addressData} ${zipCodeData}`
+} else {
+  fullAddress = addressData
+};
+const fullAddressIsValid = !fullAddress.indexOf(fullAddress.match(/^\d+\s[A-z]+\s[A-z]+/))
+// const addressWithCityAndStateOnly = fullAddress.indexOf(fullAddress.match(/([A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2})/))
+// console.log(addressWithCityAndStateOnly)
+// console.log(fullAddress.match(/([A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2})/))
+if(fullAddressIsValid) {
+  Resume.addKey('address', fullAddress)
+}
+// console.log(addressData?.[0])
+// console.log(zipCodeData)
+// console.log(cityStateAndZip[0])
+// const address = new RegExp(regularDictionary.address[0]).exec(data);
+// console.log(address)
+// Address get ^\s*\S+(?:\s+\S+){2}, just need city state and zip
 
   // console.log(newData)
   // console.log(name)
@@ -422,17 +468,19 @@ function parseLinkedInResumes(PreparedFile, cbReturnResume) {
 
   // 1 parse regulars
   parseDictionaryRegularLinkedin(rawFileData, Resume);
+  // parseDictionaryRegular(rawFileData, Resume);
 
-  // for (var i = 0; i < rows.length; i++) {
-  //   row = rows[i];
+  for (var i = 0; i < rows.length; i++) {
+    row = rows[i];
 
-  //   // 2 parse profiles
-  //   row = rows[i] = parseDictionaryProfiles(row, Resume);
-  //   // 3 parse titles
-  //   parseDictionaryTitles(Resume, rows, i);
-  //   parseDictionaryInline(Resume, row);
-  // }
+    // 2 parse profiles
+    row = rows[i] = parseDictionaryProfiles(row, Resume);
+    // 3 parse titles
+    parseDictionaryTitles(Resume, rows, i);
+    parseDictionaryInline(Resume, row);
+  }
 
+  // console.log(Resume)
   // if (_.isFunction(cbReturnResume)) {
   //   // wait until download and handle internet profile
   //   var i = 0;
