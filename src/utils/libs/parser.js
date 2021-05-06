@@ -271,16 +271,65 @@ function parseDictionaryRegular(data, Resume) {
 };
 
 function parseDictionaryRegularLinkedin(data, Resume) {
-  // console.log(data)
-  var regularDictionary = dictionary.regularLinkedin,
-      find;
+  const regularDictionary = dictionary.regularLinkedin;
+  let find;
+  const target = []
+  // --Name Section--
+// console.log(data)
+  // const nameData = data.split('\n').filter((txt, i) => txt.split(' ').length < 3 && txt.split(' ').length > 1).join(' ').split(' ').filter((x, i, arr) => firstNames.includes(x) && lastNames.includes(x))
+  const nameData = data.split('\n').filter((txt, i) => txt.split(' ').length < 4 && txt.split(' ').length > 1).join(' ').split(' ').filter(x => !x.match(/\(([^)]+)\)/) && !x.match(/"[^"]*"/));
+  // const name = `${nameData[0]} ${nameData[1]}`
+  // const newData = nameData
+  // find = new RegExp(regularDictionary.name[0]).exec(nameData)
+  // console.log(find)
+  // const address = '11592 Celine St. El Monte, CA'
+  // console.log(address.match(/\d{1,6}\s(?:[A-Za-z0-9#]+\s){0,7}(?:[A-Za-z0-9#]+,)\s*(?:[A-Za-z]+\s){0,3}(?:[A-Za-z]+,)\s*[A-Z]{2}\s*\d{5}/))
+  // const email = 'wilsonlam@gmail.com'
+  // console.log(regularDictionary.email[0])
+  // console.log(email.match(regularDictionary.email[0]))
+  // !stopWords.includes(txt.toLowerCase()) filter stop words
+  // !txt.match(regularDictionary.email[0]) filter email
+  // !x.match(/\(([^)]+)\)/) filter weird paranthesis
+  // .join(' ').split(' ').filter((x, i, arr) => firstNames.includes(x) && lastNames.includes(x)); this filter works on getting my name
+  // console.log(nameData)
+  let final = []
+for (let i = 0; i < nameData.length ; i++) {
+    if (firstNames.includes(nameData[i]) && lastNames.includes(nameData[i+1])) {
+        final.push(nameData[i] + ' ' + nameData[i+1])
+    }
+}
+
+console.log('name:', final[0])
+
+// --Email Section--
+const emailData = new RegExp(regularDictionary.email[0]).exec(data)?.[0] || 'none'
+console.log('email:', emailData)
+
+// --Phone Section--
+const phoneData = data.split('\n').filter((txt, i) => txt.split(' ').length < 3 && txt.split(' ').length > 1).join(' ').split(' ').filter(x => !x.match(/\(([^)]+)\)/) && (x.match(/^\d{3}-\d{3}-\d{4}$/) || x.match(/^\d{3}\d{3}\d{4}$/) || x.match(/^\d{3}\d{3}\d{4}$/) || x.match(/^\d{3}-\d{3}-\d{3}$/) || x.match(/^([\d]{6}|((\([\d]{3}\)|[\d]{3})( [\d]{3} |-[\d]{3}-)))[\d]{4}$/)))?.[0] || 'cannot parse'
+// const phoneData = data.split('\n').filter(txt => txt.split(" ").filter(x => x.match(/^\(?\d{1,3}-?\)?\d*-?\d*/)).join('')).reduce((a, b) => {
+//   b.split(' ').filter(x => {
+//     if(x.match(/^\(?\d{2,3}-?\)?\d*-?\d*/)) {
+//       a.push(x)
+//     }
+  
+//   })
+//   // console.log(b.match(/^\(?\d{1,3}-?\)?\d*-?\d*/))
+//   return a
+// }, []);
+// const phoneData = data.split('\n').map(x => x.replace(/ /g, "")).filter(x => x.match(/^\(?\d{1,3}-?\)?\d*-?\d*/))
+console.log(phoneData)
+
+  // console.log(newData)
+  // console.log(name)
       // console.log('parser.js line 181')
       // console.log(typeof data)
-      _.forEach(regularDictionary, function(expressions, keys) {
-        _.forEach(expressions, function(expression) {
+      // _.forEach(regularDictionary, function(expressions, keys) {
+        // console.log(expressions)
+        // _.forEach(expressions, function(expression) {
           // console.log(expression)
-        });
-      });
+        // });
+      // });
 }
 
 /**
@@ -359,21 +408,20 @@ function parseDictionaryProfiles(row, Resume) {
 
 function parseLinkedInResumes(PreparedFile, cbReturnResume) {
   // console.log('line 65')
-  // console.log(PreparedFile)
-  // var rawFileData = PreparedFile.raw,
-  // Resume = new resume(),
-  // rows = rawFileData.split('\n'),
-  // row;
+  var rawFileData = PreparedFile.raw,
+  Resume = new resume(),
+  rows = rawFileData.split('\n'),
+  row;
   // console.log(PreparedFile)
 
     // console.log(rows)
 
-    test()
+    // test()
   // save prepared file text (for debug)
   //fs.writeFileSync('./parsed/'+PreparedFile.name + '.txt', rawFileData);
 
   // 1 parse regulars
-  // parseDictionaryRegularLinkedin(rawFileData, Resume);
+  parseDictionaryRegularLinkedin(rawFileData, Resume);
 
   // for (var i = 0; i < rows.length; i++) {
   //   row = rows[i];
