@@ -274,7 +274,7 @@ function parseDictionaryRegularLinkedin(data, Resume) {
   const regularDictionary = dictionary.regularLinkedin;
   let find;
   const target = []
-  console.log(data)
+  // console.log(data)
   // console.log(data)
   // --Name Section--
 // console.log(data)
@@ -308,7 +308,6 @@ if(name[0]) {
 
 // --Email Section--
 const emailData = new RegExp(regularDictionary.email[0]).exec(data)?.[0] || 'none';
-console.log(emailData)
 if(emailData !== 'none') {
   Resume.addKey("email", emailData);
 };
@@ -480,7 +479,7 @@ function parseLinkedInResumes(PreparedFile, cbReturnResume) {
     parseDictionaryInline(Resume, row);
   }
 
-  // console.log(Resume)
+  console.log(Resume)
   // if (_.isFunction(cbReturnResume)) {
   //   // wait until download and handle internet profile
   //   var i = 0;

@@ -27,17 +27,21 @@ const fs = require('fs');
 //         // console.log(data)
 //   })
 
-ResumeParser.readResume('./test18.docx')
+// ResumeParser.readResume('./test18.docx')
+//   .then(data => {
+//         console.log(data)
+//   })
+ResumeParser.readResume('./test21.pdf')
   .then(data => {
         console.log(data)
   })
 
-// ResumeParser.readResume('./test18.pdf')
+// ResumeParser.readResume('./test.pdf')
 //   .then(data => {
 //         console.log(data)
 //   })
 
-// for(let i = 1; i < 13; i++) {
+// for(let i = 1; i < 20; i++) {
 //   ResumeParser.readResume(`./test${i}.pdf`)
 //   .then(data => {
 //       // console.log(data)
