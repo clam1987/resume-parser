@@ -24,27 +24,43 @@ const fs = require('fs');
 //   });
 // ResumeParser.readResume('./Profile.pdf')
 //   .then(data => {
-//         // console.log(data)
+//     const { experience } = data;
+//     const company = experience.split('\n')[0];
+//     const title = experience.split('\n')[1];
+//     console.log(`${title} at ${company}`)
 //   })
 
 // ResumeParser.readResume('./test18.docx')
 //   .then(data => {
-//         console.log(data)
+//     const { experience } = data;
+//     const company = experience.split('\n')[0];
+//     const title = experience.split('\n')[1];
+//     console.log(`${title} at ${company}`)
 //   })
-ResumeParser.readResume('./test21.pdf')
-  .then(data => {
-        console.log(data)
-  })
+// ResumeParser.readResume('./test17.pdf')
+//   .then(data => {
+//     const { experience } = data;
+//     const company = experience.split('\n')[0];
+//     const title = experience.split('\n')[1];
+//     console.log(`${title} at ${company}`)
+//   })
 
 // ResumeParser.readResume('./test.pdf')
 //   .then(data => {
-//         console.log(data)
+//         const { experience } = data;
+//         const title = experience.split('\n')[0];
+//         const company = experience.split('\n')[1];
+//         console.log(`${title} at ${company}`)
 //   })
 
-// for(let i = 1; i < 20; i++) {
+// for(let i = 1; i < 22; i++) {
 //   ResumeParser.readResume(`./test${i}.pdf`)
 //   .then(data => {
-//       // console.log(data)
+//     const { experience, name } = data;
+//     const company = experience.split('\n')[0];
+//     const title = experience.split('\n')[1];
+//     console.log(name)
+//     // console.log(`${title} at ${company}`)
 //   })
 // }
 // console.log(m_firstnames.length)
