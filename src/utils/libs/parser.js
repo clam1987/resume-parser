@@ -1,8 +1,11 @@
 var _ = require('underscore'),
   resume = require('../Resume'),
-  fs = require('fs'),
   dictionary = require('../../dictionary.js'),
-  logger = require('tracer').colorConsole();
+  logger = require('tracer').colorConsole(),
+  fe = require('./firstnames_f.json'),
+  ma = require('./firstnames_m.json'),
+  lastNames = require('./surnames.json'),
+  firstNames = [...fe, ...ma];
 
 var profilesWatcher = {
   // for change value by reference
@@ -11,6 +14,7 @@ var profilesWatcher = {
 
 module.exports = {
   parse: parse,
+  parseLinkedInResumes: parseLinkedInResumes,
 };
 
 function makeRegExpFromDictionary() {
@@ -61,6 +65,8 @@ function makeRegExpFromDictionary() {
 makeRegExpFromDictionary();
 
 function parse(PreparedFile, cbReturnResume) {
+  // console.log('line 65')
+  // console.log(PreparedFile)
   var rawFileData = PreparedFile.raw,
     Resume = new resume(),
     rows = rawFileData.split('\n'),
@@ -161,6 +167,60 @@ function parseDictionaryRegular(data, Resume) {
       }
     });
   });
+};
+
+function parseDictionaryRegularLinkedin(data, Resume) {
+  const regularDictionary = dictionary.regularLinkedin;
+  let find;
+  const target = []
+
+  // --Name Section--
+  const nameData = data.split('\n').filter((txt, i) => txt.split(' ').length < 4 && txt.split(' ').length > 1).join(' ').split(' ').filter(x => !x.match(/\(([^)]+)\)/) && !x.match(/"[^"]*"/));
+
+  const name = []
+for (let i = 0; i < nameData.length ; i++) {
+    if (firstNames.includes(nameData[i]) && lastNames.includes(nameData[i+1])) {
+        name.push(nameData[i] + ' ' + nameData[i+1])
+    }
+}
+
+if(name[0]) {
+  Resume.addKey("name", name[0]);
+}
+
+// --Email Section--
+const emailData = new RegExp(regularDictionary.email[0]).exec(data)?.[0] || 'none';
+if(emailData !== 'none') {
+  Resume.addKey("email", emailData);
+};
+
+// --Phone Section--
+const phoneData = data.split('\n').filter((txt, i) => txt.split(' ').length < 3 && txt.split(' ').length > 1).join(' ').split(' ').filter(x => !x.match(/\(([^)]+)\)/) && (x.match(/^\d{3}-\d{3}-\d{4}$/) || x.match(/^\d{3}\d{3}\d{4}$/) || x.match(/^\d{3}\d{3}\d{4}$/) || x.match(/^\d{3}-\d{3}-\d{3}$/) || x.match(/^([\d]{6}|((\([\d]{3}\)|[\d]{3})( [\d]{3} |-[\d]{3}-)))[\d]{4}$/)))?.[0] || new RegExp(regularDictionary.phone[0]).exec(data)?.[0]
+
+if(phoneData) {
+  Resume.addKey("phone", phoneData);
+
+// --Address--
+
+const addressData = data.split('\n').filter((txt, i) => txt.split(' ').length < 7 && txt.split(' ').length > 2)?.[0];
+const zipCodeData = data.split('\n').filter(zip => zip.match(regularDictionary.zip[0]))[0];
+const cityStateAndZip = data.split('\n').filter(addressLine2 => addressLine2.split(' ').length < 5 && addressLine2.split(' ').length > 2)?.[0];
+const addressArr = addressData.split(' ')
+const doesSteNumberExist = addressArr[addressArr.length - 1].match(/^.*?(\d+(?:[.,]\d+)?)\s*$/)?.[0];
+let fullAddress
+if(doesSteNumberExist) {
+fullAddress = `${addressData} ${cityStateAndZip}`
+} else if(zipCodeData) {
+fullAddress = `${addressData} ${zipCodeData}`
+} else {
+  fullAddress = addressData
+};
+const fullAddressIsValid = !fullAddress.indexOf(fullAddress.match(/^\d+\s[A-z]+\s[A-z]+/))
+
+if(fullAddressIsValid) {
+  Resume.addKey('address', fullAddress)
+}
+}
 }
 
 /**
@@ -236,3 +296,29 @@ function parseDictionaryProfiles(row, Resume) {
 
   return modifiedRow;
 }
+
+function parseLinkedInResumes(PreparedFile, cbReturnResume) {
+  // console.log('line 65')
+  var rawFileData = PreparedFile.raw,
+  Resume = new resume(),
+  rows = rawFileData.split('\n'),
+  row;
+
+  // save prepared file text (for debug)
+  //fs.writeFileSync('./parsed/'+PreparedFile.name + '.txt', rawFileData);
+
+  // 1 parse regulars
+  parseDictionaryRegularLinkedin(rawFileData, Resume);
+
+  for (var i = 0; i < rows.length; i++) {
+    row = rows[i];
+
+    // 2 parse profiles
+    // row = rows[i] = parseDictionaryProfiles(row, Resume);
+    // 3 parse titles
+    parseDictionaryTitles(Resume, rows, i);
+    // parseDictionaryInline(Resume, row);
+  }
+
+  return cbReturnResume(Resume);
+};
