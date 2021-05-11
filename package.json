@@ -1,7 +1,7 @@
 {
   "name": "resume-parser-linkedin",
   "version": "1.0.0",
-  "main": "test.js",
+  "main": "src/index.js",
   "dependencies": {
     "cheerio": "^1.0.0-rc.9",
     "request": "^2.88.2",
