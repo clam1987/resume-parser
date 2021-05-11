@@ -1,5 +1,5 @@
 {
-  "name": "resume-parser",
+  "name": "resume-parser-linkedin",
   "version": "1.0.0",
   "main": "test.js",
   "dependencies": {
@@ -22,7 +22,7 @@
     "url": "git+https://github.com/clam1987/resume-parser.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Wilson Lam",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/clam1987/resume-parser/issues"
