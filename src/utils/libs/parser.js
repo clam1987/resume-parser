@@ -298,7 +298,6 @@ function parseDictionaryProfiles(row, Resume) {
 }
 
 function parseLinkedInResumes(PreparedFile, cbReturnResume) {
-  // console.log('line 65')
   var rawFileData = PreparedFile.raw,
   Resume = new resume(),
   rows = rawFileData.split('\n'),
@@ -314,10 +313,10 @@ function parseLinkedInResumes(PreparedFile, cbReturnResume) {
     row = rows[i];
 
     // 2 parse profiles
-    // row = rows[i] = parseDictionaryProfiles(row, Resume);
+    row = rows[i] = parseDictionaryProfiles(row, Resume);
     // 3 parse titles
     parseDictionaryTitles(Resume, rows, i);
-    // parseDictionaryInline(Resume, row);
+    parseDictionaryInline(Resume, row);
   }
 
   return cbReturnResume(Resume);
